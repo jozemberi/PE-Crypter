@@ -3,9 +3,9 @@
 #include "shellcode.h"
 #include <stdint.h>
 
-unsigned int key[4]={0xACB6,0x1344,0xEC90,0x285C};
-
-#define BLOCK_SIZE 8
+unsigned int key[4]={0xACB6,0x1344,0xEC90,0x285C};  /* Chose a password in hex   */
+#define BLOCK_SIZE 8                               /* Make sure you change both */
+                                                  /* xtea.cpp and stub.cpp     */
 
 void decipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]){
      unsigned int i;

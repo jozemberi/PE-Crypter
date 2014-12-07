@@ -5,12 +5,10 @@
 #include <cstdlib>
 #include <stdlib.h>
 using namespace std;
-                                                     /* Chose some hex to fill in this */
-unsigned int key[4]={0xACB6,0x1344,0xEC90,0x285C};  /* variable. I don't know why     */
-//char red[1000];                                    /* these were originally chosen   */
-//char txt[10000];
 
-#define BLOCK_SIZE 8
+unsigned int key[4]={0xACB6,0x1344,0xEC90,0x285C};  /* Chose a password in hex   */
+#define BLOCK_SIZE 8                               /* Make sure you change both */
+                                                  /* xtea.cpp and stub.cpp     */
 /*
     XTea reference code taken from
     http://en.wikipedia.org/wiki/XTEA
@@ -35,39 +33,6 @@ void decipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]){
         v0 -= (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + key[sum & 3]);
      }
      v[0]=v0; v[1]=v1;
-}
-int shellcode(std::string file){
-    FILE *sf;
-    FILE *f;
-    int i, c;
-    char *arr_name;
-    sf = fopen(file.c_str(), "rb");
-    if (sf == NULL) {
-        fprintf(stderr, "fopen(%s) Failed. Could'nt open file.", file.c_str());
-        return 1;
-    }
-
-
-	//freopen ("shellcode.h","w",stdout);
-
-    arr_name = "shellcode";
-    f = fopen("shellcode.h","w");
-    fprintf(f, "unsigned char %s[] = {", arr_name);
-
-    for (i=0;;i++) {
-        if ((c = fgetc(sf)) == EOF) break;
-        if (i != 0) fprintf(f,",");
-        if ((i % 12) == 0) fprintf(f,"\n\t");
-        fprintf(f,"0x%.2X", (unsigned char)c);
-    }
-
-    fprintf(f,"\n\t};\n");
-
-	fprintf(f,"unsigned int size = %i;\n", i);
-
-    fclose(sf);
-    fclose(f);
-    return 0;
 }
 
 void crypto(char filepath[] ,bool cipher){
@@ -107,6 +72,36 @@ void crypto(char filepath[] ,bool cipher){
           memset(data,0,BLOCK_SIZE);
       }
       dat.close();
+}
+
+int shellcode(std::string file){
+    FILE *sf;
+    FILE *f;
+    int i, c;
+    char *arr_name;
+    sf = fopen(file.c_str(), "rb");
+    if (sf == NULL) {
+        fprintf(stderr, "fopen(%s) Failed. Could'nt open file.", file.c_str());
+        return 1;
+    }
+    arr_name = "shellcode";
+    f = fopen("shellcode.h","w");
+    fprintf(f, "unsigned char %s[] = {", arr_name);
+
+    for (i=0;;i++) {
+        if ((c = fgetc(sf)) == EOF) break;
+        if (i != 0) fprintf(f,",");
+        if ((i % 12) == 0) fprintf(f,"\n\t");
+        fprintf(f,"0x%.2X", (unsigned char)c);
+    }
+
+    fprintf(f,"\n\t};\n");
+
+	fprintf(f,"unsigned int size = %i;\n", i);
+
+    fclose(sf);
+    fclose(f);
+    return 0;
 }
 
 int main(int argc, char *argv[]){
