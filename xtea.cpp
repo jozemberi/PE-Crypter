@@ -36,7 +36,7 @@ void decipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]){
 }
 
 void crypto(char filepath[] ,bool cipher){
-      fstream dat(filepath,ios::in | ios::out | ios::binary);
+      fstream dat(filepath,ios::in | ios::out | ios::binary); //Open the file
       if(!dat){
         cout << "I can not read from the file you provided. Sorry :\(" << endl;
         system("pause");
@@ -57,7 +57,7 @@ void crypto(char filepath[] ,bool cipher){
       if(size%BLOCK_SIZE!=0)
           ++n_blocks;
 
-      for(int i=0;i<n_blocks;i++){
+      for(int i=0;i<n_blocks;i++){ //for every character in the executable, encipher the character
           unsigned char data[BLOCK_SIZE];
           pos=dat.tellg();
 
@@ -71,12 +71,12 @@ void crypto(char filepath[] ,bool cipher){
 
           memset(data,0,BLOCK_SIZE);
       }
-      dat.close();
+      dat.close(); //all the enciphered data was sent back the the executable
 }
 
 int shellcode(std::string file){
-    FILE *sf;
-    FILE *f;
+    FILE *sf; //executable file
+    FILE *f; //shellcode.h
     int i, c;
     char *arr_name;
     sf = fopen(file.c_str(), "rb");
@@ -88,8 +88,8 @@ int shellcode(std::string file){
     f = fopen("shellcode.h","w");
     fprintf(f, "unsigned char %s[] = {", arr_name);
 
-    for (i=0;;i++) {
-        if ((c = fgetc(sf)) == EOF) break;
+    for (i=0;;i++) {                        //grab the shellcode and drop it in
+        if ((c = fgetc(sf)) == EOF) break; //shellcode.h
         if (i != 0) fprintf(f,",");
         if ((i % 12) == 0) fprintf(f,"\n\t");
         fprintf(f,"0x%.2X", (unsigned char)c);
@@ -105,14 +105,14 @@ int shellcode(std::string file){
 }
 
 int main(int argc, char *argv[]){
-    if (argc < 2) {
+    if (argc < 2) { //RTFM
         fprintf(stderr, "Usage: %s [filepath]\n", argv[0]);
         return 1;
     }
-    crypto(argv[1], true);
+    crypto(argv[1], true); //cipher
     cout << "Finished Ciphering " << argv[1] << endl;
-    shellcode(argv[1]);
+    shellcode(argv[1]); //generate shellcode
     cout << "Finished Generating" << argv[1] << endl;
-    system("pause");
+    system("pause"); //press any key to continue
     return 0;
 }
